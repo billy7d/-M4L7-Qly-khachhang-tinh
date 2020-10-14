@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/edit/customer}" th:object="${customer}" method="post">
+    <table>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Province</th>
+
+        </tr>
+        <tr>
+            <td> <input type="hidden" th:field="*{id}"/></td>
+            <td> <input type="text" th:field="*{firstName}"/></td>
+            <td> <input type="text" th:field="*{lastName}"/></td>
+            <td>
+                <select name="province">
+                    <option th:each="p : ${provinces}"
+                            th:value="${p.id}"
+                            th:text="${p.name}"
+                            th:selected="(${p.id} == *{province.id})">
+                    </option>
+                </select>
+            </td>
+
+
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" value="save"/>
+            </td>
+        </tr>
+    </table>
+</form>
+
+</body>
+</html>
