@@ -4,18 +4,20 @@ package controller;
 import model.Customer;
 import model.Province;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import service.CustomerService;
 import service.ProvinceService;
 
+import javax.jws.WebParam;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class CustomerController {
@@ -33,8 +35,8 @@ public class CustomerController {
     }
 
     @GetMapping("/")
-    public String findAll(Model model){
-        Iterable<Customer> customers =customerService.findAll();
+    public String findAll(@PageableDefault(size = 4) Model model, Pageable pageable){
+        Page<Customer> customers =customerService.findAll(pageable);
         model.addAttribute("customers",customers);
         return "customer/index";
     }
@@ -67,5 +69,17 @@ public class CustomerController {
     public String delete(@PathVariable Integer id){
         customerService.remove(id);
         return "redirect:/";
+    }
+
+    @GetMapping("/search")
+    public String listCustomers(@RequestParam("search") Optional<String> s, Pageable pageable, Model model){
+        Page<Customer> customers;
+        if(s.isPresent()){
+            customers = customerService.findAllByFirstNameContaining(s.get(), pageable);
+        } else {
+            customers = customerService.findAll(pageable);
+        }
+        model.addAttribute("customers", customers);
+        return "customer/index";
     }
 }

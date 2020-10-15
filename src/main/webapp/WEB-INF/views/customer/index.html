@@ -8,6 +8,12 @@
 
 <a th:href="@{/create}">Create Customer</a>
 
+<form action="/search">
+    Search by first name:
+    <input name="search" type="text"/>
+    <input type="submit" value="Search"/>
+</form><br/>
+
 <table border="1px" cellpadding="10px" >
     <tr>
         <th>ID</th>
@@ -25,7 +31,14 @@
         <td><a th:href="@{'/edit/'+${c.id}}">Edit</a></td>
         <td><a th:href="@{'/delete/'+${c.id}}">Delete</a></td>
     </tr>
+
+
 </table>
+<div>
+    <a th:href="@{'/'(page=${customers.number - 1})}" th:if="${customers.hasPrevious()}">Previous</a>
+    <span th:text="${customers.number + 1}"></span>/<span th:text="${customers.totalPages}"></span>
+    <a th:href="@{'/'(page=${customers.number + 1})}" th:if="${customers.hasNext()}">Next</a>
+</div>
 
 </body>
 </html>
