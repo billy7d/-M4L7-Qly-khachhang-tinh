@@ -35,7 +35,7 @@ public class CustomerController {
     }
 
     @GetMapping("/")
-    public String findAll(@PageableDefault(size = 4) Model model, Pageable pageable){
+    public String findAll(@PageableDefault(size = 4) Pageable pageable, Model model ){
         Page<Customer> customers =customerService.findAll(pageable);
         model.addAttribute("customers",customers);
         return "customer/index";
