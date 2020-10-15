@@ -6,14 +6,12 @@ import model.Province;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import repository.ProvinceRepository;
 import service.CustomerService;
 import service.ProvinceService;
+
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +19,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Controller
+@RequestMapping("/provinces")
 public class ProvinceController {
 
     @Autowired
@@ -29,87 +28,79 @@ public class ProvinceController {
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping("/provinces")
-    public ModelAndView listProvinces(){
+    @GetMapping("")
+    public String listProvinces(Model model){
         Iterable<Province> provinces = provinceService.findAll();
-        ModelAndView modelAndView = new ModelAndView("province/list");
-        modelAndView.addObject("provinces", provinces);
-        return modelAndView;
+        model.addAttribute("provinces", provinces);
+        return "province/list";
     }
 
-    @GetMapping("/create-province")
-    public ModelAndView showCreateForm(){
-        ModelAndView modelAndView = new ModelAndView("province/create");
-        modelAndView.addObject("province", new Province());
-        return modelAndView;
+    @GetMapping("/create")
+    public String showCreateForm(Model model){
+        model.addAttribute("province", new Province());
+        return "province/create";
     }
 
-    @PostMapping("/create-province")
-    public ModelAndView saveProvince(@ModelAttribute("province") Province province){
+    @PostMapping("/create")
+    public String saveProvince(@ModelAttribute("province") Province province, Model model){
         provinceService.save(province);
-
-        ModelAndView modelAndView = new ModelAndView("province/create");
-        modelAndView.addObject("province", new Province());
-        modelAndView.addObject("message", "New province created successfully");
-        return modelAndView;
+        model.addAttribute("province", new Province());
+        model.addAttribute("message", "New province created successfully");
+        return "province/create";
     }
 
-    @GetMapping("/edit-province/{id}")
-    public ModelAndView showEditForm(@PathVariable Integer id){
+    @GetMapping("/provinces/edit/{id}")
+    public String showEditForm(@PathVariable Integer id, Model model){
         Province province = provinceService.findById(id);
         if(province != null) {
-            ModelAndView modelAndView = new ModelAndView("province/edit");
-            modelAndView.addObject("province", province);
-            return modelAndView;
+            model.addAttribute("province", province);
+            return "province/edit";
 
         }else {
-            ModelAndView modelAndView = new ModelAndView("error.404");
-            return modelAndView;
+            return "error.404";
         }
     }
 
-    @PostMapping("/edit-province")
-    public ModelAndView updateProvince(@ModelAttribute("province") Province province){
+    @PostMapping("/provinces/edit")
+    public String updateProvince(@ModelAttribute("province") Province province, Model model){
         provinceService.save(province);
-        ModelAndView modelAndView = new ModelAndView("province/edit");
-        modelAndView.addObject("province", province);
-        modelAndView.addObject("message", "Province updated successfully");
-        return modelAndView;
+
+        model.addAttribute("province", province);
+        model.addAttribute("message", "Province updated successfully");
+        return "province/edit";
     }
 
-    @GetMapping("/delete-province/{id}")
-    public ModelAndView showDeleteForm(@PathVariable Integer id){
+    @GetMapping("/provinces/delete/{id}")
+    public String showDeleteForm(@PathVariable Integer id,Model model){
         Province province = provinceService.findById(id);
         if(province != null) {
-            ModelAndView modelAndView = new ModelAndView("province/delete");
-            modelAndView.addObject("province", province);
-            return modelAndView;
+            model.addAttribute("province", province);
+            return "province/delete";
 
         }else {
-            ModelAndView modelAndView = new ModelAndView("error.404");
-            return modelAndView;
+            return "error.404";
         }
     }
 
-    @PostMapping("/delete-province")
+    @PostMapping("/provinces/delete")
     public String deleteProvince(@ModelAttribute("province") Province province){
         provinceService.remove(province.getId());
         return "redirect:provinces";
     }
 
-    @GetMapping("/view-province/{id}")
-    public ModelAndView viewProvince(@PathVariable("id") Integer id){
+    @GetMapping("/provinces/view/{id}")
+    public String viewProvince(@PathVariable("id") Integer id,Model model){
         Province province = provinceService.findById(id);
         if(province == null){
-            return new ModelAndView("/error.404");
+            return "/province/error.404";
         }
 
         Iterable<Customer> customers = customerService.findAllByProvince(province);
 
-        ModelAndView modelAndView = new ModelAndView("province/view");
-        modelAndView.addObject("province", province);
-        modelAndView.addObject("customers", customers);
-        return modelAndView;
+        ModelAndView modelAndView = new ModelAndView();
+        model.addAttribute("province", province);
+        model.addAttribute("customers", customers);
+        return "province/view";
     }
 
 }

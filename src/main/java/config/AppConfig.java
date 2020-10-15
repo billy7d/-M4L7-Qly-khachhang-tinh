@@ -1,5 +1,6 @@
 package config;
 
+import aspect.Logger;
 import formatter.ProvinceFormatter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,6 +9,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -24,9 +26,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
-import repository.CustomerRepository;
 
-import repository.ProvinceRepository;
 import service.CustomerService;
 import service.CustomerServiceImpl;
 import service.ProvinceService;
@@ -43,6 +43,7 @@ import java.util.Properties;
 @EnableTransactionManagement
 @EnableJpaRepositories("repository")
 @ComponentScan("controller")
+@EnableAspectJAutoProxy
 public class AppConfig extends WebMvcConfigurerAdapter implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 
@@ -134,6 +135,11 @@ public class AppConfig extends WebMvcConfigurerAdapter implements ApplicationCon
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addFormatter(new ProvinceFormatter(applicationContext.getBean(ProvinceService.class)));
+    }
+
+    @Bean
+    public Logger myLogger(){
+        return new Logger();
     }
 }
 
